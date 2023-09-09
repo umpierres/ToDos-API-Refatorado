@@ -13,26 +13,23 @@ export type ReturnCreateUser = {
 };
 
 export class CreateUser{
-    public execute(newUser: UserDTO): ReturnCreateUser{
+    public async execute(newUser: UserDTO): Promise<ReturnCreateUser>{
         const repository = new UserRepository();
 
-        if(repository.doesUserExist(newUser.email)){
+        const exist = await repository.doesUserExist(newUser.email)
+        if(exist){
             return {
 				success: false,
 				message: 'Usuário já existe.',
 			};
         }
 
-        const userCreated = repository.createUser(newUser);
-        const user = {
-            id: userCreated.toJSON().id,
-            email: userCreated.toJSON().email
-        }
+        const userCreated = await repository.createUser(newUser);
 
         return {
             success:true,
             message: "Usuário cadastrado com sucesso.",
-            newUserData: user,
+            newUserData: userCreated,
         }
     }
 }

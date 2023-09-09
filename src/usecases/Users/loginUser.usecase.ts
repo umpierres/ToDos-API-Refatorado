@@ -9,10 +9,10 @@ type LoginUserResponse = {
 };
 
 export class LoginUser {
-	execute(dados: UserDTO): LoginUserResponse {
+	async execute(dados: UserDTO): Promise<LoginUserResponse> {
 		const repository = new UserRepository();
 
-		const findUser = repository.loginUser(dados);
+		const findUser = await repository.loginUser(dados);
 
 		if (!findUser) {
 			return {
@@ -21,15 +21,10 @@ export class LoginUser {
 			};
 		}
 
-		const user = {
-            id: findUser.toJSON().id,
-            email: findUser.toJSON().email
-        }
-
 		return {
 			success: true,
 			message: 'Cadastro encontrado! Bem-vindo(a)',
-			data: user,
+			data: findUser,
 		};
 	}
 }
