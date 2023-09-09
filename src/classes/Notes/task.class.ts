@@ -20,13 +20,14 @@ export class Note extends BaseClass {
     
     private _date: Date
 	constructor(
+        id:string,
         private _title: string,
 		private _description: string,
 		private _favorited: boolean = false,
 		private _archived: boolean = false,
 		private _owner: Omit<User, 'password'>,
         ) {
-		super();
+		super(id);
         this._date = new Date()
 	}
 

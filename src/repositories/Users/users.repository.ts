@@ -42,7 +42,7 @@ export class UserRepository {
     }
 
     private entityToModel(userEntity: UserEntity): User {
-      return new User(userEntity.email, userEntity.password, userEntity.idUser);
+      return new User(userEntity.idUser, userEntity.email, userEntity.password );
     }
 
 }
