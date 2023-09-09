@@ -4,43 +4,81 @@ import { UserDTO } from '../../usecases';
 
 export class UserRepository { 
     async doesUserExist(email:string): Promise<boolean>{
-        const result = await Database.query(`SELECT * FROM users WHERE email = ${email}`)
+        const result = await Database.query(`SELECT * FROM users WHERE email = $1`, [email])
 
         return !!result.rowCount; 
     }
 
-    async createUser(dados:UserDTO): Promise<UserJSON>{
-        await Database.query(`INSERT INTO users (email, password) VALUES (${dados.email,dados.password})`)
-        const [lastUser] = (await Database.query(`SELECT * FROM users ORDER BY date_created DESC LIMIT 1`)).rows
+    async createUser(data:UserDTO): Promise<UserJSON>{
+        const {email, password} = data
+        const query = `
+        INSERT INTO users (email, password)
+        VALUES ($1, $2)
+        RETURNING id, email, password
+      `;
 
+        const queryParams = [email, password];  
+
+        const result = await Database.query(query, queryParams);
+        const [newUser] = result.rows;
+        
         return {
-            id: lastUser.id,
-            email: lastUser.email,
-            password: lastUser.password,
+            id: newUser.id,
+            email: newUser.email,
+            password: newUser.password,
         };
     }
 
-    async loginUser(dados: UserDTO):Promise<UserJSON | undefined> {
-        const result = await Database.query(`SELECT * FROM users WHERE email = ${dados.email} AND password = ${dados.password}`)
-        if(!result.rowCount) return undefined
-    
+    async loginUser(data: UserDTO): Promise<UserJSON | undefined> {
+        const { email, password } = data;
+        const query = `
+          SELECT *
+          FROM users
+          WHERE email = $1
+          AND password = $2
+        `;
+      
+        const queryParams = [email, password];
+      
+        const result = await Database.query(query, queryParams);
+      
+        if (result.rows.length === 0) {
+          return undefined;
+        }
+      
+        const user = result.rows[0];
+      
         return {
-            id: result.rows[0].id,
-            email: result.rows[0].email,
-            password: result.rows[0].password,
+          id: user.id,
+          email: user.email,
+          password: user.password,
         };
-
-	}
+      }
+      
     
-    async findUserByID(ownerID:string){
-        const result = await Database.query(`SELECT * FROM users WHERE id = ${ownerID}`)
-        if(!result.rowCount) return undefined
-    
+      async findUserByID(ownerID: string): Promise<UserJSON | undefined> {
+        const query = `
+          SELECT *
+          FROM users
+          WHERE id = $1
+        `;
+      
+        const queryParams = [ownerID];
+      
+        const result = await Database.query(query, queryParams);
+      
+        if (result.rows.length === 0) {
+          return undefined; 
+        }
+      
+        const user = result.rows[0];
+      
         return {
-            id: result.rows[0].id,
-            email: result.rows[0].email,
-            password: result.rows[0].password,
+          id: user.id,
+          email: user.email,
+          password: user.password,
         };
-    }
+      }
+      
 
 }
