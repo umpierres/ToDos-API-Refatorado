@@ -167,7 +167,7 @@ export class NoteRepository {
             WHEN favorited = false THEN true
             ELSE false  
           END
-          WHERE id_task = $2
+          WHERE id_task = $1
           RETURNING *
         `;
       
