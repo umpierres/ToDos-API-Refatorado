@@ -33,15 +33,13 @@ export class NoteRepository {
 
         const result = await pgHelper.client.query(query, queryParams);
 
-        const favoritedValue = data.favorited ? true : false;
-        const archivedValue = data.archived ? true : false;
         const [newTask] = result;
 
         return {
             title: newTask.title, 
             description: newTask.description,
-            favorited: favoritedValue,
-            archived: archivedValue,
+            favorited: newTask.favorited,
+            archived: newTask.archived,
             owner: newTask.id_user,
             date: newTask.date_created,
             id: newTask.id_task
@@ -144,7 +142,7 @@ export class NoteRepository {
         if (result.length === 0) return null;
         
       
-        const updatedNote = result
+        const updatedNote = result[0]
       
         return {
           title: updatedNote.title,
@@ -172,7 +170,7 @@ export class NoteRepository {
         if (result.length === 0) return null;
         
       
-        const updatedNote = result;
+        const updatedNote = result[0];
       
         return {
           title: updatedNote.title,
