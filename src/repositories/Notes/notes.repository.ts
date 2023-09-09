@@ -154,7 +154,7 @@ export class NoteRepository {
           id: updatedNote.id_task,
         };
       }
-      
+
       async toggleFavoriteStatus(noteID: string): Promise<NoteJSON | null> {
         const query = `
           UPDATE tasks
@@ -169,7 +169,6 @@ export class NoteRepository {
       
         if (result.length === 0) return null;
         
-      
         const updatedNote = result[0];
       
         return {

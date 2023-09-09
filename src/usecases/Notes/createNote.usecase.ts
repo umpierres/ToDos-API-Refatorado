@@ -32,11 +32,12 @@ export class CreateNote{
         }
 
         const repository = new NoteRepository();
+        const favorited = data.favorited !== undefined ? data.favorited : false;
 
         const newNote = await repository.createNote({
             title:data.title,
             description: data.description,
-            favorited: data.favorited,
+            favorited: favorited,
             archived: data.archived,
             ownerID: data.ownerID as UUID,
         })
