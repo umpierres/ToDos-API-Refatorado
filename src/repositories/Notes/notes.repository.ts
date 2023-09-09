@@ -158,7 +158,7 @@ export class NoteRepository {
       async toggleFavoriteStatus(noteID: string): Promise<NoteJSON | null> {
         const query = `
           UPDATE tasks
-          SET favorite = NOT favorite
+          SET favorited = NOT favorited
           WHERE id_task = $1
           RETURNING *
         `;
