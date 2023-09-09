@@ -1,6 +1,4 @@
-import { UUID } from 'crypto';
-import { User, UserJSON } from '../../classes';
-import { pgHelper } from '../../database';
+import { User } from '../../classes';
 import { UserDTO } from '../../usecases';
 import { UserEntity } from '../../database/entity/user.entity';
 
