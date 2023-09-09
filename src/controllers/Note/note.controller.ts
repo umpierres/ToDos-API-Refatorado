@@ -4,13 +4,13 @@ import { Filter } from "../../repositories";
 
 export class NoteController {
 
-    create(req: Request, res: Response) {
+    async create(req: Request, res: Response) {
         const { ownerID } = req.params
         const { title, description, favorite, archived} = req.body
 
         const usecase = new CreateNote();
 
-        const response = usecase.execute({ title, description, favorite, archived, ownerID })
+        const response = await usecase.execute({ title, description, favorite, archived, ownerID })
 
         if (!response.success) {
             return res.status(400).json(response);
@@ -19,14 +19,14 @@ export class NoteController {
         return res.status(201).json(response);
     }
 
-    listNotes(req: Request, res: Response) {
+    async listNotes(req: Request, res: Response) {
         const { ownerID } = req.params
         const { title, favorite, archived } = req.query as Filter
 
 
         const usecase = new ListNotes();
 
-        const response = usecase.execute(ownerID, { title, favorite, archived })
+        const response = await usecase.execute(ownerID, { title, favorite, archived })
 
         if (!response.success) {
             return res.status(400).json(response);
@@ -35,13 +35,13 @@ export class NoteController {
         return res.status(201).json(response);
     }
 
-    update(req: Request, res: Response) {
+    async update(req: Request, res: Response) {
         const { noteID, ownerID } = req.params
         const { title, description, action} = req.body
 
         const usecase = new UpdateNote();
 
-        const response = usecase.execute({
+        const response = await usecase.execute({
             ownerID,
             noteID,
             action: 'update',
@@ -57,12 +57,12 @@ export class NoteController {
         return res.status(201).json(response);
     }
 
-    archive(req: Request, res: Response) {
+    async archive(req: Request, res: Response) {
         const { noteID, ownerID } = req.params;
     
         const usecase = new UpdateNote();
     
-        const response = usecase.execute({
+        const response = await usecase.execute({
             ownerID,
             noteID,
             action: 'archive',
@@ -76,12 +76,12 @@ export class NoteController {
         return res.status(200).json(response);
     }
 
-    favorite(req: Request, res: Response) {
+    async favorite(req: Request, res: Response) {
         const { noteID, ownerID } = req.params;
     
         const usecase = new UpdateNote();
     
-        const response = usecase.execute({
+        const response = await usecase.execute({
             ownerID,
             noteID,
             action: 'favorite',
@@ -95,12 +95,12 @@ export class NoteController {
         return res.status(200).json(response);
     }
     
-    delete(req: Request, res: Response) {
+    async delete(req: Request, res: Response) {
         const { noteID, ownerID } = req.params
 
         const usecase = new DeleteNote();
 
-        const response = usecase.execute({
+        const response = await usecase.execute({
             ownerID,
             noteID,
         })
