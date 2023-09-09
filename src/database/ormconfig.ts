@@ -7,6 +7,7 @@ export const config: DataSourceOptions = {
     url: process.env.URL_DATABASE,
     synchronize: false,
     logging: false,
+    entities: ['src/database/entities/**/*'],
     ssl: {
         rejectUnauthorized: false,
     }
