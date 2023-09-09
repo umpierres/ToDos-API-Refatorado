@@ -2,7 +2,7 @@ import { UserJSON } from '../../classes';
 import { UserRepository } from '../../repositories';
 
 export type UserDTO = {
-    id:string;
+    id?:string;
     email:string,
     password: string,
 }
