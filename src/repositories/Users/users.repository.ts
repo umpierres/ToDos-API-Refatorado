@@ -11,19 +11,16 @@ export class UserRepository {
         return !!userExist
     }
 
-    async createUser(data:UserDTO): Promise<UserJSON>{
+    async createUser(data:UserDTO): Promise<User>{
       const { email, password } = data;
       const newUser = UserEntity.create({ email, password });
       await newUser.save();
   
-      return {
-        id: newUser.idUser as UUID,
-        email: newUser.email,
-        password: newUser.password,
-      };
+      return this.entityToModel(newUser)
+
     }
 
-    async loginUser(data: UserDTO): Promise<UserJSON | undefined> {
+    async loginUser(data: UserDTO): Promise<User | undefined> {
       const { email, password } = data;
       const user = await UserEntity.findOneBy({ email, password });
   
@@ -31,27 +28,23 @@ export class UserRepository {
         return undefined;
       }
   
-      return {
-        id: user.idUser as UUID,
-        email: user.email,
-        password: user.password,
-      };
+      return this.entityToModel(user)
+
     }
       
     
-    async findUserByID(ownerID: string): Promise<UserJSON | undefined> {
+    async findUserByID(ownerID: string): Promise<User | undefined> {
       const user = await UserEntity.findOneBy({ idUser: ownerID });
   
       if (!user) {
         return undefined;
       }
   
-      return {
-        id: user.idUser as UUID,
-        email: user.email,
-        password: user.password,
-      };
+      return this.entityToModel(user)
     }
 
+    private entityToModel(userEntity: UserEntity): User {
+      return new User(userEntity.email, userEntity.password, userEntity.idUser);
+    }
 
 }
