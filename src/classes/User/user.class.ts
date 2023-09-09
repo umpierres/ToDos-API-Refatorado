@@ -8,8 +8,10 @@ export type UserJSON = {
 
 export class User extends BaseClass{
 
-    constructor(id: string, private _email:string, private _password:string){
+    constructor(public id: string, private _email:string, private _password:string){
         super(id)
+        this._email = _email
+        this._password = _password
     }
 
     public toJSON(): UserJSON {
