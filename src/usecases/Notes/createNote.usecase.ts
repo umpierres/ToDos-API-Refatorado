@@ -5,8 +5,8 @@ import { NoteRepository, UserRepository } from '../../repositories';
 export type CreateNoteDTO = {
     title:string,
     description: string,
-    favorited: false,
-    archived: false,
+    favorited: boolean,
+    archived: boolean,
     ownerID: string,
 }
 
