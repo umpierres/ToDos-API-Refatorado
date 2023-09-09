@@ -6,11 +6,11 @@ export class NoteController {
 
     async create(req: Request, res: Response) {
         const { ownerID } = req.params
-        const { title, description, favorite, archived} = req.body
+        const { title, description, favorited, archived} = req.body
 
         const usecase = new CreateNote();
 
-        const response = await usecase.execute({ title, description, favorite, archived, ownerID })
+        const response = await usecase.execute({ title, description, favorited, archived, ownerID })
 
         if (!response.success) {
             return res.status(400).json(response);
@@ -21,12 +21,12 @@ export class NoteController {
 
     async listNotes(req: Request, res: Response) {
         const { ownerID } = req.params
-        const { title, favorite, archived } = req.query as Filter
+        const { title, favorited, archived } = req.query as Filter
 
 
         const usecase = new ListNotes();
 
-        const response = await usecase.execute(ownerID, { title, favorite, archived })
+        const response = await usecase.execute(ownerID, { title, favorited, archived })
 
         if (!response.success) {
             return res.status(400).json(response);

@@ -10,7 +10,7 @@ export type NoteJSON = {
     id: string
     title:string,
     description: string,
-    favorite: boolean,
+    favorited: boolean,
     archived: boolean,
     date: Date, 
     owner: Omit<UserJSON, 'password'>,
@@ -22,7 +22,7 @@ export class Note extends BaseClass {
 	constructor(
         private _title: string,
 		private _description: string,
-		private _favorite: boolean = false,
+		private _favorited: boolean = false,
 		private _archived: boolean = false,
 		private _owner: Omit<User, 'password'>,
         ) {
@@ -36,7 +36,7 @@ export class Note extends BaseClass {
 			id: this._id,
 			title: this._title,
 			description: this._description,
-            favorite: this._favorite, 
+            favorited: this._favorited, 
 			archived: this._archived, 
             date: this._date, 
             owner:{
@@ -67,6 +67,6 @@ export class Note extends BaseClass {
     }
 
     toggleFavoriteStatus() {
-        this._favorite = !this._favorite;
+        this._favorited = !this._favorited;
     }
 }

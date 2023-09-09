@@ -2,6 +2,7 @@ import { UserJSON } from '../../classes';
 import { UserRepository } from '../../repositories';
 
 export type UserDTO = {
+    id:string;
     email:string,
     password: string,
 }
@@ -29,7 +30,10 @@ export class CreateUser{
         return {
             success:true,
             message: "Usuário cadastrado com sucesso.",
-            newUserData: userCreated,
+            newUserData:  {
+				id:userCreated.id,
+				email:userCreated.id
+			},
         }
     }
 }

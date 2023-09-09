@@ -1,12 +1,13 @@
-import { Database } from '../../database';
+import { UUID } from 'crypto';
 import { UserJSON } from '../../classes';
+import { pgHelper } from '../../database';
 import { UserDTO } from '../../usecases';
 
 export class UserRepository { 
     async doesUserExist(email:string): Promise<boolean>{
-        const result = await Database.query(`SELECT * FROM users WHERE email = $1`, [email])
+        const result = await pgHelper.client.query(`SELECT * FROM users WHERE email = $1`, [email])
 
-        return !!result.rowCount; 
+        return result.length != 0; 
     }
 
     async createUser(data:UserDTO): Promise<UserJSON>{
@@ -14,13 +15,13 @@ export class UserRepository {
         const query = `
         INSERT INTO users (email, password)
         VALUES ($1, $2)
-        RETURNING id, email, password
+        RETURNING id_user, email, password
       `;
 
         const queryParams = [email, password];  
 
-        const result = await Database.query(query, queryParams);
-        const [newUser] = result.rows;
+        const result = await pgHelper.client.query(query, queryParams);
+        const [newUser] = result;
         
         return {
             id: newUser.id,
@@ -40,16 +41,14 @@ export class UserRepository {
       
         const queryParams = [email, password];
       
-        const result = await Database.query(query, queryParams);
+        const result = await pgHelper.client.query(query, queryParams);
       
-        if (result.rows.length === 0) {
-          return undefined;
-        }
+        if (result.length === 0) return undefined;
       
-        const user = result.rows[0];
+        const [user] = result;
       
         return {
-          id: user.id,
+          id: user.id_user,
           email: user.email,
           password: user.password,
         };
@@ -60,21 +59,20 @@ export class UserRepository {
         const query = `
           SELECT *
           FROM users
-          WHERE id = $1
+          WHERE id_user = $1
         `;
       
         const queryParams = [ownerID];
       
-        const result = await Database.query(query, queryParams);
+        const result = await pgHelper.client.query(query, queryParams);
       
-        if (result.rows.length === 0) {
-          return undefined; 
-        }
+        if (result.length === 0) return undefined; 
+        
       
-        const user = result.rows[0];
+        const user = result;
       
         return {
-          id: user.id,
+          id: user.id_user as UUID,
           email: user.email,
           password: user.password,
         };

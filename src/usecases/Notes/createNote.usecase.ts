@@ -1,10 +1,11 @@
+import { UUID } from 'crypto';
 import { NoteJSON } from '../../classes';
 import { NoteRepository, UserRepository } from '../../repositories';
 
 export type CreateNoteDTO = {
     title:string,
     description: string,
-    favorite: boolean,
+    favorited: boolean,
     archived: boolean,
     ownerID: string,
 }
@@ -35,9 +36,9 @@ export class CreateNote{
         const newNote = await repository.createNote({
             title:data.title,
             description: data.description,
-            favorite: data.favorite,
+            favorited: data.favorited,
             archived: data.archived,
-            owner: currentUser,
+            ownerID: data.ownerID as UUID,
         })
 
         const notes = await repository.listNotes(data.ownerID, {});
