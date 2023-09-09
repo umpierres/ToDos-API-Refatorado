@@ -7,12 +7,12 @@ type DeleteNoteDTO = {
 }
 
 export class DeleteNote {
-    execute(data: DeleteNoteDTO): ReturnNote {
+    async execute(data: DeleteNoteDTO): Promise<ReturnNote> {
         const {noteID, ownerID} = data
         const noteRepository = new NoteRepository()
         const userRepository = new UserRepository();
 
-        const currentUser = userRepository.findUserByID(ownerID)
+        const currentUser = await userRepository.findUserByID(ownerID)
 
         if(!currentUser) {
             return {
@@ -21,7 +21,7 @@ export class DeleteNote {
 			}; 
         }
 
-        const note = noteRepository.findNoteByID(
+        const note = await noteRepository.findNoteByID(
             ownerID,
             noteID
         )
@@ -33,7 +33,7 @@ export class DeleteNote {
 			}; 
         }
 
-        const deletedNote = noteRepository.deleteNote(noteID)
+        const deletedNote = await noteRepository.deleteNote(noteID)
 
         return {
             success: true,

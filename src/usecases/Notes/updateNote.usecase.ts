@@ -13,12 +13,12 @@ export type UpdateDTO = {
 
 
 export class UpdateNote {
-    execute(data: UpdateDTO): ReturnNote {
+    async execute(data: UpdateDTO): Promise<ReturnNote> {
         const {newInfo, noteID, ownerID} = data
         const noteRepository = new NoteRepository()
         const userRepository = new UserRepository();
 
-        const currentUser = userRepository.findUserByID(ownerID)
+        const currentUser = await userRepository.findUserByID(ownerID)
 
         if(!currentUser) {
             return {
@@ -27,7 +27,7 @@ export class UpdateNote {
 			}; 
         }
 
-        const note = noteRepository.findNoteByID(
+        const note = await noteRepository.findNoteByID(
             ownerID,
             noteID
         )
@@ -35,13 +35,13 @@ export class UpdateNote {
        
         let updatedNote;
         if (data.action === 'update') {
-         updatedNote = noteRepository.updateNote({
+         updatedNote =  await noteRepository.updateNote({
                 noteID, title: newInfo.title, description: newInfo.description
             })
         } else if(data.action === "archive") {
-            updatedNote = noteRepository.toggleArchiveStatus(noteID)
+            updatedNote = await noteRepository.toggleArchiveStatus(noteID)
         } else if(data.action === "favorite"){
-            updatedNote = noteRepository.toggleFavoriteStatus(noteID)
+            updatedNote = await noteRepository.toggleFavoriteStatus(noteID)
         }
 
         if(!updatedNote){

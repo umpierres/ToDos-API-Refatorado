@@ -19,9 +19,9 @@ export type ReturnNote = {
 };
 
 export class CreateNote{
-    execute(data: CreateNoteDTO): ReturnNote{
+    async execute(data: CreateNoteDTO): Promise<ReturnNote>{
         const userRepository = new UserRepository();
-        const currentUser = userRepository.findUserByID(data.ownerID)
+        const currentUser = await userRepository.findUserByID(data.ownerID)
 
         if(!currentUser) {
             return {
@@ -32,7 +32,7 @@ export class CreateNote{
 
         const repository = new NoteRepository();
 
-        const newNote = repository.createNote({
+        const newNote = await repository.createNote({
             title:data.title,
             description: data.description,
             favorite: data.favorite,
@@ -40,12 +40,14 @@ export class CreateNote{
             owner: currentUser,
         })
 
+        const notes = await repository.listNotes(data.ownerID, {});
+
         return {
             success:true,
             message: "Nota cadastrado com sucesso.",
             data: {
-                note: newNote.toJSON(),
-                notes: repository.listNotes(data.ownerID, {})
+                note: newNote,
+                notes: notes,
             },
         }
     }

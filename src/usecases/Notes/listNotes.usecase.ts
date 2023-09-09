@@ -2,10 +2,10 @@ import { Filter, NoteRepository, UserRepository } from '../../repositories';
 import { ReturnNote } from './createNote.usecase';
 
 export class ListNotes{
-    execute(ownerID: string, filter?: Filter) : ReturnNote {
+    async execute(ownerID: string, filter?: Filter) : Promise<ReturnNote> {
         const noteRepository = new NoteRepository()
         const userRepository = new UserRepository();
-        const currentUser = userRepository.findUserByID(ownerID)
+        const currentUser = await userRepository.findUserByID(ownerID)
 
         if(!currentUser) {
             return {
@@ -14,7 +14,7 @@ export class ListNotes{
 			}; 
         }
 
-        const notesCurrentUser = noteRepository.listNotes(ownerID, filter);
+        const notesCurrentUser = await noteRepository.listNotes(ownerID, filter);
 
         return {
             success:true,
