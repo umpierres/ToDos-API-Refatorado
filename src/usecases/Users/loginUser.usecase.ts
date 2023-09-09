@@ -24,10 +24,7 @@ export class LoginUser {
 		return {
 			success: true,
 			message: 'Cadastro encontrado! Bem-vindo(a)',
-			data: {
-				id:findUser.id,
-				email:findUser.email
-			},
+			data: findUser.toJSON(),
 		};
 	}
 }

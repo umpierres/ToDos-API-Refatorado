@@ -30,10 +30,7 @@ export class CreateUser{
         return {
             success:true,
             message: "Usuário cadastrado com sucesso.",
-            newUserData:  {
-				id:userCreated.id,
-				email:userCreated.id
-			},
+            newUserData:  userCreated.toJSON()
         }
     }
 }
