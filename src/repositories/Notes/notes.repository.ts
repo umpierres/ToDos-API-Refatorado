@@ -130,7 +130,11 @@ export class NoteRepository {
       async toggleArchiveStatus(noteID: string): Promise<NoteJSON | null> {
         const query = `
           UPDATE tasks
-          SET archived = NOT archived
+          SET archived = CASE
+            WHEN archived = true THEN false
+            WHEN archived = false THEN true
+            ELSE false  
+          END
           WHERE id_task = $1
           RETURNING *
         `;
@@ -158,8 +162,12 @@ export class NoteRepository {
       async toggleFavoriteStatus(noteID: string): Promise<NoteJSON | null> {
         const query = `
           UPDATE tasks
-          SET favorited = NOT favorited
-          WHERE id_task = $1
+          SET favorited = CASE
+            WHEN favorited = true THEN false
+            WHEN favorited = false THEN true
+            ELSE false  
+          END
+          WHERE id_task = $2
           RETURNING *
         `;
       
