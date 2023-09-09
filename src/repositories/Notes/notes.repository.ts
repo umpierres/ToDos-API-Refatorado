@@ -33,13 +33,15 @@ export class NoteRepository {
 
         const result = await pgHelper.client.query(query, queryParams);
 
+        const favoritedValue = data.favorited ? true : false;
+        const archivedValue = data.archived ? true : false;
         const [newTask] = result;
 
         return {
             title: newTask.title, 
             description: newTask.description,
-            favorited: newTask.favorited,
-            archived: newTask.archived,
+            favorited: favoritedValue,
+            archived: archivedValue,
             owner: newTask.id_user,
             date: newTask.date_created,
             id: newTask.id_task
@@ -130,11 +132,7 @@ export class NoteRepository {
       async toggleArchiveStatus(noteID: string): Promise<NoteJSON | null> {
         const query = `
           UPDATE tasks
-          SET archived = CASE
-            WHEN archived = true THEN false
-            WHEN archived = false THEN true
-            ELSE false  
-          END
+          SET archived = NOT archived
           WHERE id_task = $1
           RETURNING *
         `;
@@ -162,11 +160,7 @@ export class NoteRepository {
       async toggleFavoriteStatus(noteID: string): Promise<NoteJSON | null> {
         const query = `
           UPDATE tasks
-          SET favorited = CASE
-            WHEN favorited = true THEN false
-            WHEN favorited = false THEN true
-            ELSE false  
-          END
+          SET favorited = NOT favorited favorited
           WHERE id_task = $1
           RETURNING *
         `;
