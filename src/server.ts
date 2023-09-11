@@ -6,7 +6,9 @@ import { pgHelper } from './database';
 
 const app = express();
 
-app.use(cors());
+app.use(cors(({
+    origin: 'https://projeto-recados-redux.vercel.app',
+  })));
 app.use(express.json());
 app.use(express.urlencoded({ extended:false }));
 app.use(routes);
