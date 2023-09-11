@@ -4,7 +4,7 @@ import { UserEntity } from '../../database/entity/user.entity';
 
 export class UserRepository { 
     async doesUserExist(email:string): Promise<boolean>{
-      const userExist = await UserEntity.findOneBy({email})
+      const userExist = await UserEntity.findOne({ where: { email } })
 
         return !!userExist
     }
@@ -20,7 +20,7 @@ export class UserRepository {
 
     async loginUser(data: UserDTO): Promise<User | undefined> {
       const { email, password } = data;
-      const user = await UserEntity.findOneBy({ email, password });
+      const user = await UserEntity.findOne({ where: { email, password } });
   
       if (!user) {
         return undefined;
