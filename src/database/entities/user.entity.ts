@@ -1,4 +1,4 @@
-import { Entity , PrimaryColumn,Column, BeforeInsert, BaseEntity} from "typeorm"
+const { Entity, PrimaryColumn, Column, BeforeInsert, BaseEntity } = require("typeorm");
 
 @Entity({name:'users'})
 export class UserEntity extends BaseEntity{

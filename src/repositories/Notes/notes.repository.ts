@@ -1,5 +1,5 @@
 import { UUID } from 'crypto';
-import {NoteJSON, UserJSON } from '../../classes';
+import {NoteJSON } from '../../classes';
 import { pgHelper } from '../../database';
 
 export type CreateNoteDTO = {
