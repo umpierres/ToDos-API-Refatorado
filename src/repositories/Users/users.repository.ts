@@ -37,7 +37,7 @@ export class UserRepository {
     
     async findUserByID(ownerID: string): Promise<User | undefined> {
       const manager = pgHelper.client.manager
-      const user = await manager.findOneBy(UserEntity,{ idUser: ownerID });
+      const user = await manager.findOneBy(UserEntity,{ id: ownerID });
   
       if (!user) {
         return undefined;
@@ -47,7 +47,7 @@ export class UserRepository {
     }
 
     private entityToModel(userEntity: UserEntity): User {
-      return new User(userEntity.idUser, userEntity.email, userEntity.password );
+      return new User(userEntity.id, userEntity.email, userEntity.password );
     }
 
 }

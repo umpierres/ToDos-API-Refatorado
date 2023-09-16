@@ -1,9 +1,10 @@
-import { Entity , PrimaryColumn,Column, BeforeInsert, BaseEntity} from "typeorm"
+import {Entity, PrimaryColumn, Column, BaseEntity, OneToMany} from "typeorm"
+import { NoteEntity } from "./note.entity";
 
 @Entity({name:'users'})
 export class UserEntity extends BaseEntity{
-    @PrimaryColumn({name:'id_user', type: 'uuid'})
-    idUser!: string;
+    @PrimaryColumn({name:'id', type: 'uuid'})
+    id!: string;
 
     @Column({unique:true, length:250, type:'varchar'})
     email!:string;
@@ -14,8 +15,6 @@ export class UserEntity extends BaseEntity{
     @Column({name:'date_created'})
     dateCreated!:Date;
 
-    @BeforeInsert()
-    beforeInsert(){
-        this.dateCreated = new Date()
-    }
+    @OneToMany(() => NoteEntity, (notes) => notes.idUser)
+    notes!: NoteEntity[]
 }

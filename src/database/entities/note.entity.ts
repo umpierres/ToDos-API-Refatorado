@@ -1,9 +1,10 @@
-import { Entity , PrimaryColumn ,Column, BeforeInsert , BaseEntity} from "typeorm"
+import {Entity, PrimaryColumn, Column, BaseEntity, ManyToOne, JoinColumn} from "typeorm"
+import { UserEntity } from "./user.entity";
 
 @Entity({name:'tasks'})
 export class NoteEntity extends BaseEntity{
-    @PrimaryColumn({name:'id_task', type: 'uuid'})
-    idTask!: string;
+    @PrimaryColumn({name:'id', type: 'uuid'})
+    id!: string;
     
     @PrimaryColumn({name:'id_user'})
     idUser!: string;
@@ -14,11 +15,11 @@ export class NoteEntity extends BaseEntity{
     @Column({type:'text'})
     description!:string;
 
-    @Column({name:'date_created'})
-    dateCreated!:Date;
+    @Column({name:'created_at'})
+    createdAt!:Date;
 
-    @Column({name:'date_updated'})
-    dateUpdated!:Date;
+    @Column({name:'updated_at'})
+    updatedAt!:Date;
 
     @Column({default: false})
     favorited!:boolean;
@@ -26,9 +27,11 @@ export class NoteEntity extends BaseEntity{
     @Column({default: false})
     archived!:boolean;
 
-    @BeforeInsert()
-    beforeInsert(){
-        this.dateCreated = new Date()
-        this.dateUpdated = new Date()
-    }
+    @ManyToOne(()=> UserEntity, (user) => user.notes)
+    @JoinColumn({
+        name: 'id_user',
+        foreignKeyConstraintName:'tasks_id_user_fkey',
+        referencedColumnName:'id'
+    })
+    user!: UserEntity;
 }
