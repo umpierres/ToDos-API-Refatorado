@@ -10,7 +10,7 @@ export type UserDTO = {
 export type ReturnCreateUser = {
 	success: boolean;
 	message: string;
-	newUserData?: Omit<UserJSON, 'password'>;
+	data?: Omit<UserJSON, 'password'>;
 };
 
 export class CreateUser{
@@ -27,10 +27,12 @@ export class CreateUser{
 
         const userCreated = await repository.createUser(newUser);
 
+		const { id, email } = userCreated.toJSON();
+
         return {
             success:true,
             message: "Usuário cadastrado com sucesso.",
-            newUserData:  userCreated.toJSON()
+            data:{ id, email},
         }
     }
 }
