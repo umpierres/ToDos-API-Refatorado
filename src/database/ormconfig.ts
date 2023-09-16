@@ -8,6 +8,7 @@ export const config: DataSourceOptions = {
     synchronize: false,
     logging: false,
     entities: ['src/database/entities/**/*'],
+    migrations: ['src/database/migrations/**/*'],
     ssl: {
         rejectUnauthorized: false,
     }

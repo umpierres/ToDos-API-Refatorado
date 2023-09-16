@@ -26,6 +26,8 @@
     "dev": "tsnd --respawn --transpile-only ./src/server.ts",
     "dev:db": "tsnd --respawn --transpile-only ./src/database/index.ts",
     "build": "npx tsc",
-    "start": "node ./dist/server.js"
+    "start": "node ./dist/server.js",
+    "migration:create": "npx typeorm migration:create ./src/database/migrations/Nome-Arquivo-Migration",
+		"migration:run": "npx typeorm-ts-node-commonjs migration:run -d src/database/typeorm.ts"
   }
 }
