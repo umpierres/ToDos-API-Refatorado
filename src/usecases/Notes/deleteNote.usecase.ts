@@ -33,13 +33,13 @@ export class DeleteNote {
 			}; 
         }
 
-        const deletedNote = await noteRepository.deleteNote(noteID)
+        await noteRepository.deleteNote(noteID)
 
         return {
             success: true,
             message: "Nota deletada com sucesso.",
             data: {
-                note: deletedNote
+                note: note
             }
         };
     }

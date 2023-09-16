@@ -36,7 +36,7 @@ export class UpdateNote {
         let updatedNote;
         if (data.action === 'update') {
          updatedNote =  await noteRepository.updateNote({
-                noteID, title: newInfo.title, description: newInfo.description
+                noteID, title: newInfo.title, description: newInfo.description, updatedAt: new Date()
             })
         } else if(data.action === "archive") {
             updatedNote = await noteRepository.toggleArchiveStatus(noteID)

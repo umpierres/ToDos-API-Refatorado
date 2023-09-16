@@ -1,5 +1,5 @@
 import { UUID } from 'crypto';
-import { NoteJSON } from '../../classes';
+import { Note, NoteJSON } from '../../classes';
 import { NoteRepository, UserRepository } from '../../repositories';
 
 export type CreateNoteDTO = {
@@ -14,8 +14,8 @@ export type ReturnNote = {
 	success: boolean;
 	message: string;
 	data?: {
-        note?: NoteJSON
-        notes?: Array<NoteJSON>
+        note?: Note
+        notes?: Array<Note>
     };
 };
 
