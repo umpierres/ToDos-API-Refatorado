@@ -20,11 +20,13 @@ export class LoginUser {
 				message: 'Senha e/ou email incorretos!',
 			};
 		}
-		const { id, email } = findUser.toJSON();
+		
 		return {
 			success: true,
 			message: 'Cadastro encontrado! Bem-vindo(a)',
-			data: { id, email },
+			data: { 
+				id: findUser.toJSON().id, 
+				email: findUser.toJSON().email },
 		};
 	}
 }

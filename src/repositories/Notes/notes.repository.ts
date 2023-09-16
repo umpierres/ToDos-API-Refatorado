@@ -3,6 +3,7 @@ import {Note, NoteJSON, User } from '../../classes';
 import { pgHelper } from '../../database';
 import { NoteEntity } from '../../database/entities/note.entity';
 import { FindOptionsWhere } from 'typeorm';
+import { UserEntity } from '../../database/entities/user.entity';
 
 export type CreateNoteDTO = {
   title:string,
@@ -30,17 +31,24 @@ export class NoteRepository {
   async createNote(data: CreateNoteDTO) : Promise<Note>  {
     const { title, description, favorited, archived, ownerID } = data;
 
+    const user = await this._manager.findOneOrFail(UserEntity, {
+      where:
+      { 
+        id: ownerID
+      }
+    });
     const newNote = this._manager.create(NoteEntity, {
       idUser: ownerID,
       title,
       description,
       favorited,
-      archived
+      archived,
+      user
     })
 
-    const noteCreated = await this._manager.save(newNote)
+    const note = await this._manager.save(newNote)
 
-    return this.entityToClass(noteCreated) 
+    return this.entityToClass(note)
     }
 
   async listNotes(ownerID: string, filter?:Filter) : Promise<Note[]> {
