@@ -139,11 +139,18 @@ export class NoteRepository {
   }
 
   async deleteNote(noteID: string): Promise<void> {
-    const note = await this._manager.delete(NoteEntity, {
+    const note = await this._manager.findOne(NoteEntity, {
       where: {
-        id:noteID
-      }
-    })
+        id: noteID,
+      },
+      relations: {
+        user: true,
+      },
+    });
+  
+    if (note) {
+      await this._manager.remove(note); 
+    }
   }
 
   private entityToClass(dataDB: NoteEntity): Note {
