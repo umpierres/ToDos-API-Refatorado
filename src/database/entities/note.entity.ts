@@ -2,7 +2,7 @@ import { Entity , PrimaryColumn ,Column, BeforeInsert , BaseEntity} from "typeor
 
 @Entity({name:'tasks'})
 export class NoteEntity extends BaseEntity{
-    @PrimaryColumn({name:'id_task'})
+    @PrimaryColumn({name:'id_task', type: 'uuid'})
     idTask!: string;
     
     @PrimaryColumn({name:'id_user'})
