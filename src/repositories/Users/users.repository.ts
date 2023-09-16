@@ -1,17 +1,20 @@
 import { User } from '../../classes';
 import { UserDTO } from '../../usecases';
 import { UserEntity } from '../../database/entities/user.entity';
+import { pgHelper } from '../../database';
 
 export class UserRepository { 
     async doesUserExist(email:string): Promise<boolean>{
-      const userExist = await UserEntity.findOneBy({email})
+      const manager = pgHelper.client.manager
+      const userExist = await manager.findOneBy(UserEntity,{email})
 
         return !!userExist
     }
 
     async createUser(data:UserDTO): Promise<User>{
+      const manager = pgHelper.client.manager
       const { email, password } = data;
-      const newUser = UserEntity.create({ email, password });
+      const newUser = manager.create(UserEntity,{ email, password });
       await newUser.save();
   
       return this.entityToModel(newUser)
@@ -20,7 +23,8 @@ export class UserRepository {
 
     async loginUser(data: UserDTO): Promise<User | undefined> {
       const { email, password } = data;
-      const user = await UserEntity.findOneBy({ email, password });
+      const manager = pgHelper.client.manager
+      const user = await manager.findOneBy(UserEntity,{ email, password });
   
       if (!user) {
         return undefined;
@@ -32,7 +36,8 @@ export class UserRepository {
       
     
     async findUserByID(ownerID: string): Promise<User | undefined> {
-      const user = await UserEntity.findOneBy({ idUser: ownerID });
+      const manager = pgHelper.client.manager
+      const user = await manager.findOneBy(UserEntity,{ idUser: ownerID });
   
       if (!user) {
         return undefined;
