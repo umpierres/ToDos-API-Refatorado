@@ -40,7 +40,6 @@ export class CreateTableNote1694845276066 implements MigrationInterface {
 						name: 'updated_at',
 						type: 'timestamp',
 						isNullable: false,
-						default: 'now()',
 					},
                     {
 						name: 'favorited',
