@@ -1,210 +1,147 @@
 import { UUID } from 'crypto';
-import {NoteJSON } from '../../classes';
+import {Note, NoteJSON, User } from '../../classes';
 import { pgHelper } from '../../database';
+import { NoteEntity } from '../../database/entities/note.entity';
+import { FindOptionsWhere } from 'typeorm';
 
 export type CreateNoteDTO = {
-    title:string,
-    description: string,
-    favorited: boolean,
-    archived: boolean,
-    ownerID: UUID,
+  title:string,
+  description: string,
+  favorited: boolean,
+  archived: boolean,
+  ownerID: UUID,
 }
 export type UpdateNoteDTO = {
-    noteID: string,
-    title?:string,
-    description?: string,
+  noteID: string
+  title?:string,
+  description?: string,
+  updatedAt: Date
 }
 
 export type Filter = {
-    title?: string;
-    favorited?: boolean;
-    archived?: boolean;
+  title?: string;
+  favorited?: boolean;
+  archived?: boolean;
 }
 
 export class NoteRepository {
-    async createNote(data: CreateNoteDTO) : Promise<NoteJSON> {
-        const { title, description, favorited, archived, ownerID } = data;
-        const query = `
-        INSERT INTO tasks (title, description, favorited, archived, id_user)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING title, description, favorited, archived, id_user, date_created, id_task
-      `;
-        const queryParams = [title, description, favorited, archived, ownerID];
+  constructor(private _manager = pgHelper.client.manager){}
 
-        const result = await pgHelper.client.query(query, queryParams);
+  async createNote(data: CreateNoteDTO) : Promise<Note>  {
+    const { title, description, favorited, archived, ownerID } = data;
 
-        const [newTask] = result;
+    const newNote = this._manager.create(NoteEntity, {
+      idUser: ownerID,
+      title,
+      description,
+      favorited,
+      archived
+    })
 
-        return {
-            title: newTask.title, 
-            description: newTask.description,
-            favorited: newTask.favorited,
-            archived: newTask.archived,
-            owner: newTask.id_user,
-            date: newTask.date_created,
-            id: newTask.id_task
-        };
+    const noteCreated = await this._manager.save(newNote)
+
+    return this.entityToClass(noteCreated) 
+    }
+
+  async listNotes(ownerID: string, filter?:Filter) : Promise<Note[]> {
+    const condition: FindOptionsWhere<NoteEntity> = {
+      idUser: ownerID,
+    }
+    if(filter) {
+      if(filter.title){
+        condition.title = filter.title
       }
-    //ok
-    async listNotes(ownerID: string, filter?:Filter) : Promise<NoteJSON[]> {
-        const query = `
-          SELECT *
-          FROM tasks
-          WHERE id_user = $1
-        `;
-        const queryParams = [ownerID];
+
+      if(filter.favorited){
+        condition.favorited = filter.favorited
+      }
+
+      if(filter.archived){
+        condition.archived = filter.archived
+      }
+    }
+
+    const filteredList = await this._manager.find(NoteEntity, {
+      where: condition, 
+      relations: {
+        user: true
+      }
+    })
+
+    return filteredList.map((note) => this.entityToClass(note))
+  }
+      
+  async findNoteByID(ownerID: string, noteID: string): Promise<Note | undefined> {
+    const manager = pgHelper.client.manager;
+    const note = await manager.findOne(NoteEntity,{
+      where: {
+        id: noteID,
+        idUser: ownerID
+      },
+      relations: {
+        user: true
+      }
+    })
+
+    if (!note) return undefined
+    
+    return this.entityToClass(note)
+  }
+
+  async updateNote(data: UpdateNoteDTO): Promise<void> {
+    const {title, description, noteID, updatedAt} = data
+
+    await this._manager.update(NoteEntity, {
+      id: noteID
+    }, {
+      title, 
+      description, 
+      updatedAt
+    })
+  }
+      
+  async toggleArchiveStatus(noteID: string): Promise<Note | null> {
+    const note = await this._manager.findOne(NoteEntity, {
+      where: {
+          id: noteID,
+      }
+    });
+
+    if (!note) return null;
+
+    note.archived = !note.archived;
+    await this._manager.save(NoteEntity, note);
+
+    return this.entityToClass(note);
+  }
+
+  async toggleFavoriteStatus(noteID: string): Promise<Note | null> {
+    const note = await this._manager.findOne(NoteEntity, {
+      where: {
+          id: noteID,
+      }
+    });
+
+    if (!note) return null;
+
+    note.favorited = !note.favorited;
+    await this._manager.save(NoteEntity, note);
+
+    return this.entityToClass(note);
+  }
+
+  async deleteNote(noteID: string): Promise<void> {
+    const note = await this._manager.delete(NoteEntity, {
+      where: {
+        id:noteID
+      }
+    })
+  }
+
+  private entityToClass(dataDB: NoteEntity): Note {
+    const user = new User(dataDB.user.id, dataDB.user.email, dataDB.user.password);
+    const note = new Note(dataDB.id, dataDB.title, dataDB.description, dataDB.archived,dataDB.favorited, user);
   
-        const notesUser = await pgHelper.client.query(query, queryParams);
-      
-         const listNotesUser: NoteJSON[] = notesUser.map((n:any) => {
-         return {
-          title: n.title,
-          description: n.description,
-          favorited: n.favorited,
-          archived: n.archived,
-          owner: n.id_user,
-          date: n.date_created,
-          id: n.id_task
-        }
-        });
-
-        return listNotesUser
-      }
-      
-      async findNoteByID(ownerID: string, noteID: string): Promise<NoteJSON | undefined> {
-        const query = `
-          SELECT *
-          FROM tasks
-          WHERE id_user = $1
-          AND id_task = $2
-        `;
-      
-        const queryParams = [ownerID, noteID];
-      
-        const result = await pgHelper.client.query(query, queryParams);
-      
-        if (result.length === 0) return undefined;
-        
-      
-        const note = result;
-      
-        return {
-          title: note.title,
-          description: note.description,
-          favorited: note.favorited,
-          archived: note.archived,
-          owner: note.id_user,
-          date: note.date_created,
-          id: note.id_task,
-        };
-      }
-
-      async updateNote(data: UpdateNoteDTO): Promise<NoteJSON | undefined> {
-        const query = `
-          UPDATE tasks
-          SET title = $1, description = $2
-          WHERE id_task = $3
-          RETURNING *
-        `;
-      
-        const queryParams = [data.title, data.description, data.noteID];
-      
-        const result = await pgHelper.client.query(query, queryParams);
-      
-        if (result.length === 0) return undefined; 
-      
-      
-        const updatedNote = result;
-      
-        return {
-          title: updatedNote.title,
-          description: updatedNote.description,
-          favorited: updatedNote.favorited,
-          archived: updatedNote.archived,
-          owner: updatedNote.id_user,
-          date: updatedNote.date_created,
-          id: updatedNote.id_task,
-        };
-      }
-      
-      async toggleArchiveStatus(noteID: string): Promise<NoteJSON | null> {
-        const query = `
-          UPDATE tasks
-          SET archived = NOT archived
-          WHERE id_task = $1
-          RETURNING *
-        `;
-      
-        const queryParams = [noteID];
-      
-        const result = await pgHelper.client.query(query, queryParams);
-      
-        if (result.length === 0) return null;
-        
-      
-        const updatedNote = result[0]
-      
-        return {
-          title: updatedNote.title,
-          description: updatedNote.description,
-          favorited: updatedNote.favorited,
-          archived: updatedNote.archived,
-          owner: updatedNote.id_user,
-          date: updatedNote.date_created,
-          id: updatedNote.id_task,
-        };
-      }
-
-      async toggleFavoriteStatus(noteID: string): Promise<NoteJSON | null> {
-        const query = `
-          UPDATE tasks
-          SET favorited = NOT favorited
-          WHERE id_task = $1
-          RETURNING *
-        `;
-      
-        const queryParams = [noteID];
-      
-        const result = await pgHelper.client.query(query, queryParams);
-      
-        if (result.length === 0) return null;
-        
-        const updatedNote = result[0];
-      
-        return {
-          title: updatedNote.title,
-          description: updatedNote.description,
-          favorited: updatedNote.favorited,
-          archived: updatedNote.archived,
-          owner: updatedNote.id_user,
-          date: updatedNote.date_created,
-          id: updatedNote.id_task,
-        };
-      }
-      //ok
-      async deleteNote(noteID: string): Promise<NoteJSON | undefined> {
-        const query = `
-          DELETE FROM tasks
-          WHERE id_task = $1
-          RETURNING *
-        `;
-      
-        const queryParams = [noteID];
-      
-        const result = await pgHelper.client.query(query, queryParams);
-      
-        if (result.length === 0) return undefined; 
-        
-        const deletedNote = result;
-      
-        return {
-          title: deletedNote.title,
-          description: deletedNote.description,
-          favorited: deletedNote.favorited,
-          archived: deletedNote.archived,
-          owner: deletedNote.id_user,
-          date: deletedNote.date_created,
-          id: deletedNote.id_task,
-        };
-      }
+    return note;
+  }
 }

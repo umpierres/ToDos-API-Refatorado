@@ -13,7 +13,7 @@ export type NoteJSON = {
     favorited: boolean,
     archived: boolean,
     date: Date, 
-    owner: Omit<UserJSON, 'password'>,
+    ownerID: Omit<UserJSON, 'password'>,
 }
 
 export class Note extends BaseClass {
