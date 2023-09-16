@@ -15,9 +15,9 @@ export class UserRepository {
       const manager = pgHelper.client.manager
       const { email, password } = data;
       const newUser = manager.create(UserEntity,{ email, password });
-      await newUser.save();
+      const userCreated = await manager.save(newUser);
   
-      return this.entityToModel(newUser)
+      return this.entityToClass(userCreated)
 
     }
 
@@ -30,7 +30,7 @@ export class UserRepository {
         return undefined;
       }
   
-      return this.entityToModel(user)
+      return this.entityToClass(user)
 
     }
       
@@ -43,10 +43,10 @@ export class UserRepository {
         return undefined;
       }
   
-      return this.entityToModel(user)
+      return this.entityToClass(user)
     }
 
-    private entityToModel(userEntity: UserEntity): User {
+    private entityToClass(userEntity: UserEntity): User {
       return new User(userEntity.id, userEntity.email, userEntity.password );
     }
 

@@ -12,8 +12,8 @@ export class UserEntity extends BaseEntity{
     @Column({length:250, type:'varchar'})
     password!:string;
 
-    @Column({name:'date_created'})
-    dateCreated!:Date;
+    @Column({name:'created_at'})
+    createdAt!:Date;
 
     @OneToMany(() => NoteEntity, (notes) => notes.idUser)
     notes!: NoteEntity[]
