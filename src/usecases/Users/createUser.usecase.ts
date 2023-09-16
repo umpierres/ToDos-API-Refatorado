@@ -27,12 +27,13 @@ export class CreateUser{
 
         const userCreated = await repository.createUser(newUser);
 
-		const { id, email } = userCreated.toJSON();
-
         return {
             success:true,
             message: "Usuário cadastrado com sucesso.",
-            data:{ id, email},
+            data:{
+                id: userCreated.toJSON().id, 
+				email: userCreated.toJSON().email
+            },
         }
     }
 }
